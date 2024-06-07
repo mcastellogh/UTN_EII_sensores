@@ -10,14 +10,14 @@
 // Licence:             GPLV3+
 // Version:             1.0.0
 // Date:                Mayo 2024
-// Info:                Proyect template for Electrónica II
+// Info:                Project 'sensores' for Electrónica II
 
 //====================[Use & storage]============================================
 // PCB:                 NodeMCU 
 // Plataforma:          ESP8266  
-// Use:                 Template
-// Folder:              template_EII_V1
-// Proyect name:        template_EII_V1
+// Use:                 measures
+// Folder:              sensores
+// Proyect name:        sensores
 
 //====================[ToDo]=====================================================     
 //        
@@ -37,17 +37,19 @@
 //--Includes
 #include "app.h"
 
-
 //--Local variables
-uint16_t led_delay=200;
-Data * dataToPus;
+Data * dataToPush;
 
-//--Extern variables
-extern uint8_t var_count;
-
-//--Functions
+//--Main application
 void App_loop(void){
-    dataToPus=measure_loop();
-    Serial.printf("%s: inst:%3.1f ave:%3.1f sd:%3.1f max:%3.1f min:%3.1f\r\n",dataToPus[TEMP_AMB].name, dataToPus[TEMP_AMB].inst_value, dataToPus[TEMP_AMB].ave_value,dataToPus[TEMP_AMB].sd_value,dataToPus[TEMP_AMB].max_value,dataToPus[TEMP_AMB].min_value);
+    dataToPush=measure_loop();
+    if(dataToPush[TEMP_AMB].procesed){
+        Serial.printf("%s: inst:%3.1f ave:%3.1f sd:%3.1f max:%3.1f min:%3.1f\r\n",dataToPush[TEMP_AMB].name, dataToPush[TEMP_AMB].inst_value, dataToPush[TEMP_AMB].ave_value,dataToPush[TEMP_AMB].sd_value,dataToPush[TEMP_AMB].max_value,dataToPush[TEMP_AMB].min_value);
+        dataToPush[TEMP_AMB].procesed=false;
+    }
+    if(dataToPush[TEMP_EXT].procesed){
+        Serial.printf("%s: inst:%3.1f ave:%3.1f sd:%3.1f max:%3.1f min:%3.1f\r\n",dataToPush[TEMP_EXT].name, dataToPush[TEMP_EXT].inst_value, dataToPush[TEMP_EXT].ave_value,dataToPush[TEMP_EXT].sd_value,dataToPush[TEMP_EXT].max_value,dataToPush[TEMP_EXT].min_value);
+        dataToPush[TEMP_EXT].procesed=false;
+    }
     delay(200);
 }

@@ -1,5 +1,5 @@
 <h1>Catedra de Electrónica II</h1>
-<h1>TP N°1 Led destellante</h1>
+<h1>TP N°2 Sensores</h1>
 <h2>Indice</h2>
 
 - [Introducción](#introducción)
@@ -10,7 +10,7 @@
 
 
 ## Introducción
-El presente proyecto es el primero de una serie de trabajos prácticos de la asignatura Electrónica II del 4° año de la Carrera de Ingeniería Eléctrica. El proyecto implementa un microcontrolador ESP32 que incorpora un led que destella con un período determinado por la variable ```led_delay```.
+
 
 ## Circuito
 En la figura se aprecia el circuito de este trabajo práctico, donde se observa que el led está en el pin físico 37 de la placa de desarrollo NODE-MCU32, que corresponde al puerto 23 (GPIO23) del microcontrolador.
@@ -27,11 +27,11 @@ git clone <https://github.com/nombre_de_usuario_github/repositorio> [directorio 
 Comandos para clonar este repositorio:
 ```
 cd /home/admlca/electronicaII/platformio
-git clone https://github.com/mcastellogh/UTN_ledTTL ledTT
+git clone https://github.com/mcastellogh/UTN_EII_sensores sensores
 ```
 
 ## Consigna
-Modificar el programa incorporando otra variable para poder hacer que los tiempos de encendido y apagado del led sean diferentes cambiando el valor de las dos variables correspondientes.
+Modificar el programa incorporando un sensor para medición de humedad relativa.
 
 
 ## Licencia

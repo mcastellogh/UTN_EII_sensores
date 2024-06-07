@@ -4,23 +4,26 @@
 // Licence:             GPLV3+
 // Version:             1.0.0
 // Date:                Mayo 2024
-// Info:                Proyect template for Electrónica II
+// Info:                Project for Electrónica II
 //=======================================================================
 
+//--Includes
 #include "setup.h"
 
 //--Harcoded local variables
 const char * device_name="device01";
-const char * device_type="LedDriver";
+const char * device_type="Sensor";
 
+//--Local variables
 uint8_t var_count;
 
+//--Startup function
 void App_setup(void){
     Serial.begin(SERIAL_BAUDRATE);
 
     //--PINS
     pinMode(ONBOARD_LED_PIN,OUTPUT);
-    pinMode(LED_PIN,OUTPUT);
+    pinMode(ACT_LED_PIN,OUTPUT);
 
     //--Init measures
     measure_init();
@@ -28,8 +31,9 @@ void App_setup(void){
     //--Calculate the number of variables in Data Structure
     var_count=measure_count();
 
-    welcome();
+    led_welcome();
 
     //--Presentation
-    Serial.printf("\r\nCátedra de Electrónica II UTN-FRRO\r\n");
+    Serial.print("Cátedra de Electrónica II UTN-FRRO");
+    Serial.println("Utilización de sensores analógicos y digitales");
 }

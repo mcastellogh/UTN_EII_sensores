@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <Average.h>  //--https://registry.platformio.org/libraries/majenkolibraries/Average/examples/AverageExample/AverageExample.ino
 #include "config.h"
-
+#include "leds.h"
 
 //--Macros
 #define MAX_SEC_AVE_AN          60                              //register interval in sec
@@ -51,13 +51,8 @@ struct Data {
   uint8_t sensor;
   uint8_t type;
   uint8_t pin;
+  bool procesed;
 };
-
-struct Process {
-    Average<float> pr();
-    //Average<float> pr(600);
-};
-
 
 //--Public prototypes
 void measure_init(void);
@@ -65,10 +60,7 @@ uint8_t measure_count(void);
 Data * measure_loop(void);
 
 //--Private prototypes
-void measure_read_sensor(void);
-float measure_unit_calc(uint8_t reg_idx, uint16_t unit);
-
-
-
+void _measure_read_sensor(void);
+float _measure_unit_calc(uint8_t reg_idx, uint16_t unit);
 
 #endif

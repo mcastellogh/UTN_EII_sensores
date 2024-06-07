@@ -4,7 +4,7 @@
 // Licence:             GPLV3+
 // Version:             1.0.0
 // Date:                Mayo 2024
-// Info:                Proyect template for Electrónica II
+// Info:                Project for Electrónica II
 //=======================================================================
 
 #include "setup.h"
