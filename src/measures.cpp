@@ -10,6 +10,9 @@
 //--Includes
 #include "measures.h"
 
+#define NUM_AVERAGE_OBJECTS 2
+#define WINDOW_SIZE         60
+
 //--Local variables
 float lm35gain=1;
 float lm35offset=0;
@@ -28,15 +31,28 @@ extern Config config;
 //  "Humedad", 0, 0, 0, 0, RH, DIGITALVAR, DHT22_PIN
 Data data[] = {
     // name, raw_value, inst_value, ave_value, sd_value, max_value, min_value, sensor, type, pin
-    "Temperatura ambiente", 0, 0, 0, 0, 0, 0, TC1047, ANALOGVAR, TEMP_AMB_PIN,0,
-    "Temperatura exterior", 0, 0, 0, 0, 0, 0, TC1047, ANALOGVAR, TEMP_EXT_PIN,0
+    "Temperatura ambiente", TEMP_AMB, 0, 0, 0, 0, 0, 0, TC1047, ANALOGVAR, TEMP_AMB_PIN,0,
+    "Temperatura exterior", TEMP_EXT, 0, 0, 0, 0, 0, 0, TC1047, ANALOGVAR, TEMP_EXT_PIN,0
 };
+  const char* name;
+  uint8_t variable;
+  uint16_t raw_value;
+  float inst_value;
+  float ave_value;
+  float sd_value;
+  float max_value;
+  float min_value;
+  uint8_t sensor;
+  uint8_t type;
+  uint8_t pin;
+  bool procesed;
 
 //--Calculate number of variables in Data Structure
 const uint8_t numberOfVars = sizeof(data) / sizeof(data[0]);
 
-//--Create array_proc objet to calculate average, max, min & sd for temperature readings
-Average<float> array_proc[numberOfVars](MAX_SEC_AVE_AN);
+//--Create temp_proc objet to calculate average, max, min & sd for temperature readings
+//Average<float> temp_proc(SAMPLES_COUNT);
+Average<float>* array_proc[NUM_AVERAGE_OBJECTS];
 
 
 //-----------------------------------------------------------------------------
@@ -48,6 +64,9 @@ void measure_init(void){
     msec_an_reg=millis();
     msec_an_sample=millis();
     Serial.println(numberOfVars);
+        for (int i = 0; i < NUM_AVERAGE_OBJECTS; i++) {
+        array_proc[i] = new Average<float>(WINDOW_SIZE);
+    }
 }
 
 uint8_t measure_count(void){
@@ -57,7 +76,7 @@ uint8_t measure_count(void){
 Data * measure_loop(void){
     if((millis()-msec_an_sample)>=MAX_mSEC_SAMPLE_AN){
         #ifdef DEBUG_MEAS
-            Serial.print("Take a sample:");
+            Serial.print("[DEBUG] Take a sample:");
             sample++;
             Serial.println(sample);
         #endif
@@ -67,21 +86,21 @@ Data * measure_loop(void){
     }
     if((millis()-msec_an_reg)>=MAX_mSEC_AVE_AN){
         #ifdef DEBUG_MEAS
-            Serial.println("Process...");
+            Serial.println("[DEBUG] Process...");
             sample=0;
         #endif
         for (uint8_t var_idx=0;var_idx<numberOfVars;var_idx++){
             if(data[var_idx].type==ANALOGVAR){
-                data[var_idx].ave_value=array_proc[var_idx].mean();
-                data[var_idx].ave_value=array_proc[var_idx].mean();
-                data[var_idx].sd_value=array_proc[var_idx].stddev();
-                data[var_idx].max_value=array_proc[var_idx].maximum();
-                data[var_idx].min_value=array_proc[var_idx].minimum();        
+                data[var_idx].ave_value=array_proc[var_idx]->mean();
+                data[var_idx].ave_value=array_proc[var_idx]->mean();
+                data[var_idx].sd_value=array_proc[var_idx]->stddev();
+                data[var_idx].max_value=array_proc[var_idx]->maximum();
+                data[var_idx].min_value=array_proc[var_idx]->minimum();        
                 data[var_idx].procesed=true;
                 msec_an_reg=millis();
                 led_flash(25, 5, ACT_LED_PIN);
                 #ifdef DEBUG_MEAS
-                    Serial.printf("%s: inst:%3.1f ave:%3.1f sd:%3.1f max:%3.1f min:%3.1f\r\n",data[var_idx].name,\
+                    Serial.printf("[DEBUG] %s: inst:%3.1f ave:%3.1f sd:%3.1f max:%3.1f min:%3.1f\r\n",data[var_idx].name,\
                         data[var_idx].inst_value,\
                         data[var_idx].ave_value, \
                         data[var_idx].sd_value, \
@@ -101,9 +120,19 @@ Data * measure_loop(void){
 void _measure_read_sensor(void){
     for (uint8_t var_idx=0;var_idx<numberOfVars;var_idx++){
         if(data[var_idx].type==ANALOGVAR){
-            data[var_idx].raw_value = analogRead(data[var_idx].pin);
-            data[var_idx].inst_value = _measure_unit_calc(var_idx, data[var_idx].sensor);
-            array_proc[var_idx].push(data[var_idx].inst_value);                   
+            switch(data[var_idx].variable){
+                case TEMP_AMB:
+                    data[var_idx].raw_value = analogRead(data[var_idx].pin);
+                    data[var_idx].inst_value = _measure_unit_calc(var_idx, data[var_idx].sensor);
+                    array_proc[TEMP_AMB]->push(data[var_idx].inst_value);                   
+                    break;
+                case TEMP_EXT:
+                    data[var_idx].raw_value = analogRead(data[var_idx].pin);
+                    data[var_idx].inst_value = _measure_unit_calc(var_idx, data[var_idx].sensor);
+                    array_proc[TEMP_EXT]->push(data[var_idx].inst_value);                   
+                    break;
+
+            }
         }
     }
 }

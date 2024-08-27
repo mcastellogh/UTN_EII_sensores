@@ -11,6 +11,7 @@
 #define MAX_SEC_SAMPLE_AN       1                               //sample interval in sec
 #define MAX_mSEC_AVE_AN         ((MAX_SEC_AVE_AN)*(1000))       //register interval in msec
 #define MAX_mSEC_SAMPLE_AN      ((MAX_SEC_SAMPLE_AN)*(1000))    //sample interval in msec
+#define SAMPLES_COUNT           MAX_SEC_AVE_AN/MAX_SEC_SAMPLE_AN          
 
 #define DEBUG_MEAS //for debug purposes
 
@@ -42,6 +43,7 @@ enum var_pos{
 //--Structures for measured variables
 struct Data {
   const char* name;
+  uint8_t variable;
   uint16_t raw_value;
   float inst_value;
   float ave_value;
