@@ -1,5 +1,5 @@
-#ifndef _mediciones_h_
-#define _mediciones_h_
+#ifndef _measures_h_
+#define _measures_h_
 
 #include <Arduino.h>
 #include <Average.h>  //--https://registry.platformio.org/libraries/majenkolibraries/Average/examples/AverageExample/AverageExample.ino

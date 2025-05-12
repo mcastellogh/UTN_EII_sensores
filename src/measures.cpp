@@ -1,5 +1,5 @@
 //=======================================================================
-// File:                leds.cpp
+// File:                measures.cpp
 // Author:              Marcelo Castello (https://github.com/mcastellogh)
 // Licence:             GPLV3+
 // Version:             1.0.0
@@ -9,9 +9,6 @@
 
 //--Includes
 #include "measures.h"
-
-#define NUM_AVERAGE_OBJECTS 2
-#define WINDOW_SIZE         60
 
 //--Local variables
 float lm35gain=1;
@@ -27,32 +24,33 @@ extern Config config;
 
 
 //--Create data array with variables to measure
+//-- Each variable is called 'register'
 //--Example:
-//  "Humedad", 0, 0, 0, 0, RH, DIGITALVAR, DHT22_PIN
+//  "Humedad", 0, 0, 0, 0, RH, DIGITALVAR, DHT22_PIN 
 Data data[] = {
     // name, raw_value, inst_value, ave_value, sd_value, max_value, min_value, sensor, type, pin
     "Temperatura ambiente", TEMP_AMB, 0, 0, 0, 0, 0, 0, TC1047, ANALOGVAR, TEMP_AMB_PIN,0,
     "Temperatura exterior", TEMP_EXT, 0, 0, 0, 0, 0, 0, TC1047, ANALOGVAR, TEMP_EXT_PIN,0
 };
-  const char* name;
-  uint8_t variable;
-  uint16_t raw_value;
-  float inst_value;
-  float ave_value;
-  float sd_value;
-  float max_value;
-  float min_value;
-  uint8_t sensor;
-  uint8_t type;
-  uint8_t pin;
-  bool procesed;
+
+const char* name;
+uint8_t variable;
+uint16_t raw_value;
+float inst_value;
+float ave_value;
+float sd_value;
+float max_value;
+float min_value;
+uint8_t sensor;
+uint8_t type;
+uint8_t pin;
+bool procesed;
 
 //--Calculate number of variables in Data Structure
 const uint8_t numberOfVars = sizeof(data) / sizeof(data[0]);
 
-//--Create temp_proc objet to calculate average, max, min & sd for temperature readings
-//Average<float> temp_proc(SAMPLES_COUNT);
-Average<float>* array_proc[NUM_AVERAGE_OBJECTS];
+//--Create array_proc objet to calculate average, max, min & sd for variable readings
+Average<float>* array_proc[numberOfVars];
 
 
 //-----------------------------------------------------------------------------
@@ -61,11 +59,15 @@ Average<float>* array_proc[NUM_AVERAGE_OBJECTS];
 
 
 void measure_init(void){
+    //uint16_t samples=config.t_reg/config.t_sample; //for future features
+    uint16_t samples=MAX_mSEC_AVE_AN/MAX_mSEC_SAMPLE_AN; //Calculate number of samples based on register time (average time) and sample time
     msec_an_reg=millis();
     msec_an_sample=millis();
     Serial.println(numberOfVars);
-        for (int i = 0; i < NUM_AVERAGE_OBJECTS; i++) {
-        array_proc[i] = new Average<float>(WINDOW_SIZE);
+    //--Build a process array for each variable
+    //--This array is used for Average library to calculate min, max, mean & sd values for each variable
+    for (int i = 0; i < numberOfVars; i++) {
+        array_proc[i] = new Average<float>(samples);
     }
 }
 
